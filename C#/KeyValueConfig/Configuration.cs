@@ -1,0 +1,164 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Reflection;
+using System.IO;
+
+namespace COBRA
+{
+
+    /*! simplified access to application and user configuration 
+     * */
+    public sealed class Configuration
+    {
+
+        /*! hides all the mess with multiple configuration files access
+         * */
+        public class EasyAccess
+        {
+            /*! contains key value pairs of configuration
+             * */
+            private Dictionary<string, string> _keyValues = new Dictionary<string, string>();
+
+            /*! stores the config file name
+             * */
+            private string _configFile = "";
+
+            /*! true: if configuration values have changed
+             * */
+            private bool _dirty = false;
+
+            /*! opens specified configuration file and stores all keys and values
+             * */
+            internal EasyAccess(string logFile)
+            {
+                this._configFile = logFile;
+
+                System.Configuration.KeyValueConfigurationCollection settings;
+                System.Configuration.Configuration config;
+
+                System.Configuration.ExeConfigurationFileMap configFile = new System.Configuration.ExeConfigurationFileMap();
+                configFile.ExeConfigFilename = logFile;
+                config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(configFile, System.Configuration.ConfigurationUserLevel.None);
+                settings = config.AppSettings.Settings;
+
+                string[] keys = settings.AllKeys;
+
+                for (int i = 0; i < keys.Count<string>(); ++i)
+                {
+                    string value = settings[keys[i]].Value;
+                    _keyValues[keys[i]] = value;
+                }
+            }
+
+            /*! saves all keys and values to config file 
+             * 
+             * if dirty flag is set
+             * */
+            ~EasyAccess()
+            {
+                if (_dirty)
+                {
+                    System.Configuration.KeyValueConfigurationCollection settings;
+                    System.Configuration.Configuration config;
+
+                    System.Configuration.ExeConfigurationFileMap configFile = new System.Configuration.ExeConfigurationFileMap();
+                    configFile.ExeConfigFilename = _configFile;
+                    config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(configFile, System.Configuration.ConfigurationUserLevel.None);
+                    settings = config.AppSettings.Settings;
+                    settings.Clear();
+
+                    Dictionary<string, string>.Enumerator enu = _keyValues.GetEnumerator();
+                    while (enu.MoveNext())
+                    {
+                        settings.Add(enu.Current.Key, enu.Current.Value);
+                    }
+
+                    config.Save(ConfigurationSaveMode.Modified);
+                }
+            }
+
+            /*! returns value to specified key
+             * 
+             * \param key the key
+             * \returns the value
+             * */
+            public string Get(string key, string fallbackValue="")
+            {
+                if (_keyValues.ContainsKey(key))
+                {
+                    return _keyValues[key];
+                }
+                else
+                {
+                    return fallbackValue;
+                }
+            }
+
+            /*! sets a key value pair
+             * 
+             * \param key the key
+             * \param value the value
+             * */
+            public void Set(string key, string value)
+            {
+                _keyValues[key] = value;
+                _dirty = true;
+            }
+        }
+
+        /*! single instance of Configuration
+         */
+        private static volatile Configuration instance;
+
+        /*! object used for lock mechanism
+        */
+        private static object syncRoot = new Object();
+
+        /*! creates and returns instance of Configuration
+			
+        \returns instance of Configuration
+        */
+        public static Configuration Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new Configuration();
+                        }
+                    }
+                }
+
+                return instance;
+            }
+        }
+
+        /*! access to all application settings
+         * */
+        public EasyAccess Application { get; private set; }
+
+        /*! access to all user settings
+         * */
+        public EasyAccess User { get; private set; }
+
+        /*! initializes configuration
+         * */
+        private Configuration()
+        {
+            Uri codeBase = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+            string path = codeBase.LocalPath;
+            string exePath = Path.GetDirectoryName(path);
+
+            string configFilePrefix = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(System.AppDomain.CurrentDomain.FriendlyName));
+
+            Application = new EasyAccess(exePath + "\\..\\config\\" + configFilePrefix + ".xml");
+            User = new EasyAccess(exePath + "\\..\\config\\" + configFilePrefix + "User.xml");
+        }
+    }
+}
