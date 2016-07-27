@@ -1,0 +1,31 @@
+//#define lerp(v0, v1, t) v0 + t*(v1-v0)
+#define lerp(v0, v1, t) (1.0f-t)*v0 + t*v1
+
+        float32 delta0 = d0 - d1;
+        float32 delta1 = d2 - d3;
+        float32 delta2 = d4 - d5;
+        float32 delta3 = d6 - d7;
+
+        float32 temp1 = lerp(delta0, delta1, calcPos._z);
+        float32 temp2 = lerp(delta2, delta3, calcPos._z);
+        normal._x = lerp(temp1, temp2, calcPos._y);
+
+        float32 delta4 = d0 - d4;
+        float32 delta5 = d1 - d5;
+        float32 delta6 = d2 - d6;
+        float32 delta7 = d3 - d7;
+
+        temp1 = lerp(delta4, delta5, calcPos._x);
+        temp2 = lerp(delta6, delta7, calcPos._x);
+        normal._y = lerp(temp1, temp2, calcPos._z);
+
+        float32 delta8 = d0 - d2;
+        float32 delta9 = d4 - d6;
+        float32 delta10 = d1 - d3;
+        float32 delta11 = d5 - d7;
+
+        temp1 = lerp(delta8, delta9, calcPos._y);
+        temp2 = lerp(delta10, delta11, calcPos._y);
+        normal._z = lerp(temp1, temp2, calcPos._x);
+
+        normal.normalize();
