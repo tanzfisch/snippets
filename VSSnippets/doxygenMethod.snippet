@@ -4,15 +4,29 @@
     <CodeSnippet Format="1.0.0">
         <Header>
             <Title>doxygen method description</Title>
-        </Header>
+			<Shortcut>dox</Shortcut>
+        </Header>		
         <Snippet>
+			<Declarations>
+				<Literal>
+					<ID>BriefDescription</ID>
+					<ToolTip>Enter brief description</ToolTip>
+					<Default>brief description</Default>
+				</Literal>
+				<Literal>
+					<ID>DetailedDescription</ID>
+					<ToolTip>Enter detailed description</ToolTip>
+					<Default>detailed description</Default>
+				</Literal>
+
+			</Declarations>		
             <Code Language="CSharp">
-<![CDATA[/*! brief description
+<![CDATA[
+	/*! $BriefDescription$
 
-full description
+	$DetailedDescription$
 
-\param firstParam ...
-\returns ...
+	\param $end$
 */]]>
             </Code>
         </Snippet>
