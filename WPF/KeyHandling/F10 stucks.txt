@@ -1,0 +1,16 @@
+
+        public void OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            System.Windows.Input.Key key = e.Key;
+
+            if (e.SystemKey == System.Windows.Input.Key.F10)
+            {
+                key = e.SystemKey; // get actual F10 value
+                e.Handled = true; // tell windows that the key is already handled
+            }
+
+			// now handle the keys			
+			
+            switch (key)
+            {
+                case System.Windows.Input.Key.D1:
