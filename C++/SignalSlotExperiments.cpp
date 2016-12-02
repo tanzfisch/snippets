@@ -28,7 +28,7 @@ public:
 
     // connects a member function of a given object to this iSignal
     template <typename F, typename... A>
-    void connect_member(F&& f, A&& ... a) const
+    void connectMember(F&& f, A&& ... a) const
     {
         _slots.push_back(bind(f, a...));
     }
@@ -51,7 +51,7 @@ public:
     }
 
     // disconnects all previously connected functions
-    void disconnect_all() const
+    void clear() const
     {
         _slots.clear();
     }
@@ -67,7 +67,7 @@ public:
     // assignment creates new iSignal
     iSignal& operator=(iSignal const& other)
     {
-        disconnect_all();
+        clear();
     }
 
 private:
@@ -117,7 +117,7 @@ int main()
 
     iSignal<> signal2;
     Message message;
-    signal2.connect_member(&Message::message, message);       /// hier ist es ok 
+    signal2.connectMember(&Message::message, message);       /// hier ist es ok 
 
     signal2();
 
