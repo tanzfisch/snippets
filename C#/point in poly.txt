@@ -1,0 +1,16 @@
+        /*! source http://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+        */
+        private bool CheckPoint(List<Vector2d> polygon, Vector2d point)
+        {
+            bool c = false;
+            int i, j;
+            for (i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
+            {
+                if (((polygon[i].Y > point.Y) != (polygon[j].Y > point.Y)) &&
+                 (point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X))
+                {
+                    c = !c;
+                }
+            }
+            return c;
+        }
